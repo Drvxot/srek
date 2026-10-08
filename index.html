@@ -69,8 +69,10 @@ small{display:block;margin-top:16px;opacity:.42;font-size:.68rem}
 </div>
 <script>
 let chosen = null;
-let hasTriedFirst = false; // CRITICAL: Added this so the logic works
+let hasTriedFirst = false; // <--- ADD THIS LINE HERE
+
 function choose(platform) {
+    // ... rest of your code ...
     chosen = platform;
     document.getElementById("snap").classList.toggle("active", platform === "snap");
     document.getElementById("insta").classList.toggle("active", platform === "insta");
