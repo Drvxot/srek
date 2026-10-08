@@ -1,0 +1,1 @@
+Put your birthday photos in this folder. The current page uses built-in placeholders; edit index.html to insert your images.
